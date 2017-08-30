@@ -42,11 +42,32 @@ class AdjListGraph
       end
     end
   end
+  def iddfs
+    @visited = Set.new
+    max_depth = 10
+    puts "Iterative deepening Depth first search (Max depth #{max_depth}):"
+    (0..max_depth).to_a.each do |depth|
+      dls(0, depth)
+    end
+  end
+  def dls(vertex, depth)
+    if depth == 0
+      if !@visited.include? vertex
+        @visited.add(vertex)
+        puts "visited #{vertex}"
+      end
+      return
+    end
+    @val[vertex].each do |adj|
+      dls(adj, depth-1)
+    end
+  end
   def bfs
     @visited = Set.new
     puts "Breadth first search:"
     queue = [0]
     @visited.add(queue[0])
+    puts "visited #{queue[0]}"
     while queue.length > 0
       vtx = queue.shift
       @val[vtx].each do |adj|
@@ -65,6 +86,7 @@ class AdjListGraph
     puts @val.map { |x| x.join(' ') }
   end
   def topo_sort
+    puts "Topological sort"
     @visited = Set.new
     @half_visited = Set.new
     res = []
@@ -95,6 +117,7 @@ adjGraph = AdjListGraph.new(graph)
 puts "#{adjGraph.val.length} vertices"
 adjGraph.dfs
 adjGraph.bfs
+adjGraph.iddfs
 
 directedGraph = AdjListGraph.new(dir_g)
 puts directedGraph.topo_sort.inspect

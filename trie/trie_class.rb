@@ -41,6 +41,9 @@ class PrefixTrie
     end
     return true
   end
+  def search(word)
+    
+  end
 end
 
 pt = PrefixTrie.new
