@@ -44,10 +44,14 @@ class AdjListGraph
   end
   def iddfs
     @visited = Set.new
-    max_depth = 10
-    puts "Iterative deepening Depth first search (Max depth #{max_depth}):"
-    (0..max_depth).to_a.each do |depth|
-      dls(0, depth)
+    puts "Iterative deepening DFS:"
+    (0..@val.length).to_a.each do |depth|
+      puts "Running at depth #{depth}"
+      if @visited.length < @val.length
+        dls(0, depth)
+      else
+        break
+      end
     end
   end
   def dls(vertex, depth)
@@ -86,7 +90,7 @@ class AdjListGraph
     puts @val.map { |x| x.join(' ') }
   end
   def topo_sort
-    puts "Topological sort"
+    puts "Topological sort:"
     @visited = Set.new
     @half_visited = Set.new
     res = []
