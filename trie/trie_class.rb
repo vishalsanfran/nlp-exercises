@@ -27,9 +27,25 @@ class PrefixTrie
       cnt += 1
     end
   end
+  def startsWith(word)
+    curNode = @root
+    size = word.length
+    cnt = 0
+    while cnt < size
+      if curNode.children.include? word[cnt]
+        curNode = curNode.children[word[cnt]]
+        cnt += 1
+      else
+        return false
+      end
+    end
+    return true
+  end
 end
 
 pt = PrefixTrie.new
 pt.insert("home")
 pt.insert("hole")
 pt.insert("homer")
+puts "\tDoes it include 'hom'? : #{pt.startsWith('hom')}\n
+  \tDoes it include 'homs'? : #{pt.startsWith('homs')}"
