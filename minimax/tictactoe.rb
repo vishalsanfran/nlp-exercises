@@ -1,5 +1,5 @@
 class Board
-  attr_accessor :array2d
+  attr_accessor :array2d, :winlen
   def initialize(row, col, winlen)
     @array2d = Array.new(row){Array.new(col)}
     @winlen = winlen
@@ -156,7 +156,7 @@ end
 class GameRunner
   def initialize(board)
     @board = board
-    @maxdepth = 4
+    @maxdepth = 6
     @board.show
   end
   def play(val)
@@ -188,14 +188,15 @@ class GameRunner
     end
   end
   def one_player
+    puts "Playing vs Computer, Match #{@board.winlen} tiles to win! "
     cnt = 0
     size = @board.array2d.length*@board.array2d[0].length
-    puts size
     while cnt < size
       player = cnt%2
       if player == 0
         play(player)
       else
+        puts "Computer is thinking..."
         res = next_ai_move
         row = res[0]
         col = res[1]
@@ -204,7 +205,7 @@ class GameRunner
       end
       @board.show
       if @board.someone_win?
-        winner = player == 0 ? "You" : "You suck, Computer"
+        winner = player == 0 ? "You" : "Sorry, Computer"
         puts "#{winner} won!"
         break
       end
@@ -213,9 +214,16 @@ class GameRunner
   end
   def minimax(depth, player)
     moves = @board.get_empty
-    if depth == 0 or moves.length == 0
-      return eval_func(player, depth)
+    if moves.length == 0
+      return 0
     end
+    score = eval_func(player, depth)
+    puts "score #{score}"
+    if depth == 0 or score == 10 or score == -10
+      return score
+    end
+    row = -1
+    col = -1
     if player == 1
       best = -999999
       moves.each do |move|
@@ -236,6 +244,7 @@ class GameRunner
         @board.array2d[row][col] = nil
       end
     end
+
     return best
   end
   def eval_func(player, depth)
@@ -266,7 +275,7 @@ end
 #                [0,0,1,1],
 #                [1,2,2,0] ]
 #puts brd.someone_win?.inspect
-brd = Board.new(4,4,3)
+brd = Board.new(3,3,3)
 gm = GameRunner.new(brd)
 #gm.two_player
 gm.one_player
