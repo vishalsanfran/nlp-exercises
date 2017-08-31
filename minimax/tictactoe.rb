@@ -12,6 +12,17 @@ class Board
   def someone_win?
     return won_row? || won_col? || won_diag? || won_antidiag?
   end
+  def get_empty
+    res = []
+    (0..@array2d.length-1).to_a.each do |row|
+      (0..@array2d[0].length-1).to_a.each do |col|
+        if @array2d[row][col] == nil
+          res.push([row, col])
+        end
+      end
+    end
+    return res
+  end
   def won_row?
     #puts "checking row"
     (0..@array2d.length-1).to_a.each do |row|
@@ -145,10 +156,14 @@ end
 class GameRunner
   def initialize(board)
     @board = board
+    @maxdepth = 4
+    @board.show
   end
   def play(val)
-    puts "player #{val} enter row and col"
+    puts "player #{val} enter row and col (nil entries are available)"
+    print "Row: "
     row = gets.to_i
+    print "Column: "
     col = gets.to_i
     if row >= @board.array2d.length or col >= @board.array2d[0].length
       raise Exception, "Out of Index"
@@ -161,7 +176,6 @@ class GameRunner
   def two_player
     cnt = 0
     size = @board.array2d.length*@board.array2d[0].length
-    puts size
     while cnt < size
       player = cnt%2
       play(player)
@@ -172,6 +186,77 @@ class GameRunner
       end
       cnt += 1
     end
+  end
+  def one_player
+    cnt = 0
+    size = @board.array2d.length*@board.array2d[0].length
+    puts size
+    while cnt < size
+      player = cnt%2
+      if player == 0
+        play(player)
+      else
+        res = next_ai_move
+        row = res[0]
+        col = res[1]
+        puts "AI plays #{res.inspect}"
+        @board.array2d[row][col] = 1
+      end
+      @board.show
+      if @board.someone_win?
+        winner = player == 0 ? "You" : "You suck, Computer"
+        puts "#{winner} won!"
+        break
+      end
+      cnt += 1
+    end
+  end
+  def minimax(depth, player)
+    moves = @board.get_empty
+    if depth == 0 or moves.length == 0
+      return eval_func(player, depth)
+    end
+    if player == 1
+      best = -999999
+      moves.each do |move|
+        row = move[0]
+        col = move[1]
+        @board.array2d[row][col] = player
+        val = minimax(depth-1, 0)
+        best = [best, val].max
+        @board.array2d[row][col] = nil
+      end
+    else
+      best = 999999
+      moves.each do |move|
+        row = move[0]
+        col = move[1]
+        @board.array2d[row][col] = player
+        best = [best, minimax(depth-1, 1)].min
+        @board.array2d[row][col] = nil
+      end
+    end
+    return best
+  end
+  def eval_func(player, depth)
+    mult = player == 1 ? 10 - depth : depth - 10
+    return @board.someone_win? ? mult : 0
+  end
+  def next_ai_move
+    best = -999999
+    res = [-1, -1]
+    @board.get_empty.each do |move|
+      row = move[0]
+      col = move[1]
+      @board.array2d[row][col] = 1
+      val = minimax(@maxdepth, 1)
+      @board.array2d[row][col] = nil
+      if val > best
+        res = [row, col]
+        best = val
+      end
+    end
+    return res
   end
 end
 
@@ -184,3 +269,4 @@ end
 brd = Board.new(4,4,3)
 gm = GameRunner.new(brd)
 #gm.two_player
+gm.one_player
