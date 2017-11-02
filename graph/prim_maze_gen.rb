@@ -1,5 +1,5 @@
 class Maze
-  def initialize(rows, cols, wall="*", path="=")
+  def initialize(rows, cols, wall="|", path="-")
     @brd = Array.new(rows){Array.new(cols){wall}}
     @path = path
   end
@@ -61,6 +61,19 @@ class Maze
     list.delete_at(prng.rand(list.length))
   end
 end
+def get_maze_rows_cols(deflt_rows=15, deflt_cols=20)
+  begin
+    rows = ARGV.length >= 1 ? ARGV[0].to_i : deflt_rows
+    cols = ARGV.length >= 2 ? ARGV[1].to_i : deflt_cols
+  rescue
+    rows = deflt_rows
+    cols = deflt_cols
+  end
+  puts "Presenting a #{rows} x #{cols} maze:"
+  [rows, cols]
+end
 
-maze = Maze.new(4,5)
+row_col = get_maze_rows_cols
+
+maze = Maze.new(row_col[0], row_col[1])
 maze.set_prim_maze
